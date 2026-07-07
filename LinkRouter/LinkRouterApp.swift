@@ -13,6 +13,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var preferencesWindow: NSWindow?
     
     @AppStorage("rules") private var rules: [Rule] = []
+    @AppStorage("browsers") private var browsers: [URL] = []
     @AppStorage("showInMenuBar") private var showInMenuBar: Bool = true
     
     var statusMenu: NSMenu!
@@ -23,7 +24,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         UserDefaults.standard.addObserver(self, forKeyPath: "showInMenuBar", options: [.new], context: nil)
         
-        if UserDefaults.standard.object(forKey: "browsers") == nil {
+        // First launch (or wiped settings): populate the browser list so the
+        // prompt is usable immediately instead of waiting for a manual rescan.
+        if browsers.isEmpty {
+            browsers = BrowserUtil.loadBrowsers(oldBrowsers: [])
             openPreferences()
         }
     }
