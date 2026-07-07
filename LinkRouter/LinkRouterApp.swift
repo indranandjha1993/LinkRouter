@@ -129,32 +129,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let url = urls.first!
             
             if url.scheme == "linkrouter" && url.host == "open" {
-                if let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-                   let queryItems = components.queryItems,
-                   let encodedUrl = queryItems.first(where: { $0.name == "url" })?.value,
-                   let decodedData = Data(base64Encoded: encodedUrl),
-                   let decodedUrlString = String(data: decodedData, encoding: .utf8),
-                   let decodedUrl = URL(string: decodedUrlString) {
-                    processedUrls = [decodedUrl]
+                if let target = url.linkRouterDeepLinkTarget {
+                    processedUrls = [target]
                 } else {
                     return
                 }
             }
-            
+
             let urlString = processedUrls.first!.absoluteString
 
-            // An empty pattern would match every URL and silently swallow all links.
-            for rule in rules where !rule.regex.isEmpty {
-                let regex = try? Regex(rule.regex).ignoresCase()
-                
-                if let regex, urlString.firstMatch(of: regex) != nil {
-                    BrowserUtil.openURL(
-                        processedUrls,
-                        app: rule.app,
-                        isIncognito: false
-                    )
-                    return
-                }
+            for rule in rules where rule.matches(urlString) {
+                BrowserUtil.openURL(
+                    processedUrls,
+                    app: rule.app,
+                    isIncognito: false
+                )
+                return
             }
         }
         
