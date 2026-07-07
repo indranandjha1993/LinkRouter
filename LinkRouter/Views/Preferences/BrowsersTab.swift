@@ -41,7 +41,7 @@ struct BrowsersTab: View {
                             Spacer()
                                 .frame(width: 8)
 
-                            Text(bundle.infoDictionary!["CFBundleName"] as! String)
+                            Text(bundle.appDisplayName)
                                 .font(
                                     .system(size: 14)
                                 )

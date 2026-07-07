@@ -52,54 +52,43 @@ struct GeneralTab: View {
         return Bundle(url: browserUrl)?.bundleIdentifier
     }
     
+    // Every preference key the app owns. Export/import must stay on this
+    // allowlist: dictionaryRepresentation() includes the global defaults
+    // domain, which would leak unrelated system state into the file.
+    private static let settingsKeys = [
+        "browsers", "hiddenBrowsers", "apps", "rules", "shortcuts",
+        "directories", "privateArgs", "showInMenuBar", "apps_atTop",
+        "copy_closeAfterCopy", "copy_alternativeShortcut",
+    ]
+
     func exportSettings() {
         let defaults = UserDefaults.standard
-        let dictionary = defaults.dictionaryRepresentation()
-        
-        let filteredSettings = dictionary.filter { key, _ in
-            !key.contains("NS") &&
-            !key.contains("com.apple.") &&
-            !key.contains("Apple") &&
-            !key.contains("METAL") &&
-            !key.contains("KB_") &&
-            !key.contains("cloud.") &&
-            !key.starts(with: "_") &&
-            !key.starts(with: "AK") &&
-            key != "shouldShowRSVPDataDetectors" &&
-            key != "MultipleSessionEnabled" &&
-            key != "WebAutomaticSpellingCorrectionEnabled" &&
-            key != "Country"
-        }
-        
+
         var appSettings: [String: Any] = [:]
-        for (key, value) in filteredSettings {
-            appSettings[key] = value
+        for key in Self.settingsKeys {
+            if let value = defaults.object(forKey: key) {
+                appSettings[key] = value
+            }
         }
-        
-        print(appSettings)
-        
+
         exportDocument = SettingsDocument(settings: appSettings)
         showingExportPicker = true
     }
-    
+
     func importSettings(from url: URL) {
         do {
             let data = try Data(contentsOf: url)
-            let settings = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-            
-            guard let settings = settings else {
-                print("Invalid settings format")
+
+            guard let settings = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
                 return
             }
-            
+
             let defaults = UserDefaults.standard
-            for (key, value) in settings {
+            for (key, value) in settings where Self.settingsKeys.contains(key) {
                 defaults.set(value, forKey: key)
             }
-            
-            print("Settings imported successfully")
         } catch {
-            print("Failed to import settings: \(error.localizedDescription)")
+            NSLog("Failed to import settings: \(error.localizedDescription)")
         }
     }
     

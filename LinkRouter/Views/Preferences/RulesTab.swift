@@ -44,7 +44,10 @@ struct RuleItem: View {
     @State private var editPresented = false
     
     var body: some View {
-        let bundle = Bundle(url: rule.app)!
+        // The target app may have been uninstalled — keep the row visible so
+        // the rule can still be edited or deleted.
+        let appName = Bundle(url: rule.app)?.appDisplayName
+            ?? rule.app.deletingPathExtension().lastPathComponent + " (missing)"
 
         HStack {
             Button(action: {
@@ -57,20 +60,20 @@ struct RuleItem: View {
                     .foregroundStyle(.primary)
             }
             .buttonStyle(.plain)
-            
+
             Spacer()
-            
-            
-            Text(bundle.infoDictionary!["CFBundleName"] as! String)
+
+
+            Text(appName)
                 .font(
                     .system(size: 14)
                 )
-            
-            
+
+
             Spacer()
                 .frame(width: 8)
-            
-            Image(nsImage: NSWorkspace.shared.icon(forFile: bundle.bundlePath))
+
+            Image(nsImage: NSWorkspace.shared.icon(forFile: rule.app.path))
                 .resizable()
                 .frame(width: 32, height: 32)
         }

@@ -25,7 +25,8 @@ struct EditAppForm: View {
     }
     
     var body: some View {
-        let bundle = Bundle(url: app.app)!
+        let appName = Bundle(url: app.app)?.appDisplayName
+            ?? app.app.deletingPathExtension().lastPathComponent + " (missing)"
 
         Form {
             Section(
@@ -52,7 +53,7 @@ struct EditAppForm: View {
                         }
                     }
                     
-                    Text("\(bundle.infoDictionary!["CFBundleName"] as! String)")
+                    Text(appName)
                         .padding(.horizontal, 5)
                         .font(.callout)
                         .foregroundStyle(.secondary)

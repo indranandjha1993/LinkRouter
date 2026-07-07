@@ -31,12 +31,38 @@ struct PromptView: View {
             }
         }
         .filter {
-            !browsers.contains($0.app)
+            // Skip stale entries for uninstalled apps: their rows are not
+            // rendered, so they would desync keyboard selection indexes.
+            !browsers.contains($0.app) && Bundle(url: $0.app) != nil
         }
     }
 
     var visibleBrowsers: [URL] {
-        browsers.filter { !hiddenBrowsers.contains($0) }
+        browsers.filter { !hiddenBrowsers.contains($0) && Bundle(url: $0) != nil }
+    }
+
+    private enum PromptEntry {
+        case app(App)
+        case browser(URL)
+    }
+
+    private var orderedEntries: [PromptEntry] {
+        let appEntries = appsForUrls.map(PromptEntry.app)
+        let browserEntries = visibleBrowsers.map(PromptEntry.browser)
+        return appsAtTop ? appEntries + browserEntries : browserEntries + appEntries
+    }
+
+    private func openSelected(isIncognito: Bool) {
+        guard orderedEntries.indices.contains(selected) else {
+            return
+        }
+
+        switch orderedEntries[selected] {
+        case .app(let app):
+            openUrlsInApp(app: app)
+        case .browser(let browser):
+            BrowserUtil.openURL(urls, app: browser, isIncognito: isIncognito)
+        }
     }
 
     func openUrlsInApp(app: App) {
@@ -74,7 +100,7 @@ struct PromptView: View {
                                         browser: app.app,
                                         urls: urls,
                                         bundle: bundle,
-                                        shortcut: shortcuts[bundle.bundleIdentifier!]
+                                        shortcut: bundle.bundleIdentifier.flatMap { shortcuts[$0] }
                                     ) {
                                         openUrlsInApp(app: app)
                                     }
@@ -97,7 +123,7 @@ struct PromptView: View {
                                     browser: browser,
                                     urls: urls,
                                     bundle: bundle,
-                                    shortcut: shortcuts[bundle.bundleIdentifier!]
+                                    shortcut: bundle.bundleIdentifier.flatMap { shortcuts[$0] }
                                 ) {
                                     BrowserUtil.openURL(
                                         urls,
@@ -123,7 +149,7 @@ struct PromptView: View {
                                         browser: app.app,
                                         urls: urls,
                                         bundle: bundle,
-                                        shortcut: shortcuts[bundle.bundleIdentifier!]
+                                        shortcut: bundle.bundleIdentifier.flatMap { shortcuts[$0] }
                                     ) {
                                         openUrlsInApp(app: app)
                                     }
@@ -146,59 +172,19 @@ struct PromptView: View {
                         selected = max(0, selected - 1)
                         scrollViewProxy.scrollTo(selected, anchor: .center)
                     } else if command == .down {
-                        selected = min(visibleBrowsers.count + appsForUrls.count - 1, selected + 1)
+                        selected = min(max(orderedEntries.count - 1, 0), selected + 1)
                         scrollViewProxy.scrollTo(selected, anchor: .center)
                     }
                 }
                 .background {
                     Button(action: {
-                        if appsAtTop {
-                            if selected < appsForUrls.count {
-                                openUrlsInApp(app: appsForUrls[selected])
-                            } else {
-                                BrowserUtil.openURL(
-                                    urls,
-                                    app: visibleBrowsers[selected - appsForUrls.count],
-                                    isIncognito: false
-                                )
-                            }
-                        } else {
-                            if selected < visibleBrowsers.count {
-                                BrowserUtil.openURL(
-                                    urls,
-                                    app: visibleBrowsers[selected],
-                                    isIncognito: false
-                                )
-                            } else {
-                                openUrlsInApp(app: appsForUrls[selected - visibleBrowsers.count])
-                            }
-                        }
+                        openSelected(isIncognito: false)
                     }) {}
                     .opacity(0)
                     .keyboardShortcut(.defaultAction)
 
                     Button(action: {
-                        if appsAtTop {
-                            if selected < appsForUrls.count {
-                                openUrlsInApp(app: appsForUrls[selected])
-                            } else {
-                                BrowserUtil.openURL(
-                                    urls,
-                                    app: visibleBrowsers[selected - appsForUrls.count],
-                                    isIncognito: true
-                                )
-                            }
-                        } else {
-                            if selected < visibleBrowsers.count {
-                                BrowserUtil.openURL(
-                                    urls,
-                                    app: visibleBrowsers[selected],
-                                    isIncognito: true
-                                )
-                            } else {
-                                openUrlsInApp(app: appsForUrls[selected - visibleBrowsers.count])
-                            }
-                        }
+                        openSelected(isIncognito: true)
                     }) {}
                     .opacity(0)
                     .keyboardShortcut(.return, modifiers: [.shift])

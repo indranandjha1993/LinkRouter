@@ -7,6 +7,16 @@
 
 import Foundation
 
+extension Bundle {
+    /// Human-readable app name that never crashes: not every app declares
+    /// CFBundleName (some only set CFBundleDisplayName, or neither).
+    var appDisplayName: String {
+        (infoDictionary?["CFBundleDisplayName"] as? String)
+            ?? (infoDictionary?["CFBundleName"] as? String)
+            ?? bundleURL.deletingPathExtension().lastPathComponent
+    }
+}
+
 extension URL {
     func matchesHost(_ configuredHost: String) -> Bool {
         if configuredHost.isEmpty {

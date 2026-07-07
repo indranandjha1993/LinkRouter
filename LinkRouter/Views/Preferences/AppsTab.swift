@@ -92,52 +92,58 @@ struct AppItem: View {
     @State private var editPresented = false
 
     var body: some View {
-        if let bundle = Bundle(url: app.app) {
-            HStack {
-                Button(action: {
-                    editPresented.toggle()
-                }) {
-                    Label(
-                        app.host.isEmpty ? "*" : app.host,
-                        systemImage: "pencil"
-                    )
-                    .font(
-                        .system(size: 14)
-                    )
-                    .foregroundStyle(.primary)
-                }
-                .buttonStyle(.plain)
+        // The target app may have been uninstalled — keep the row visible so
+        // the entry can still be edited or deleted.
+        let bundle = Bundle(url: app.app)
+        let appName = bundle?.appDisplayName
+            ?? app.app.deletingPathExtension().lastPathComponent + " (missing)"
 
-                Spacer()
+        HStack {
+            Button(action: {
+                editPresented.toggle()
+            }) {
+                Label(
+                    app.host.isEmpty ? "*" : app.host,
+                    systemImage: "pencil"
+                )
+                .font(
+                    .system(size: 14)
+                )
+                .foregroundStyle(.primary)
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
 
 
-                Text(bundle.infoDictionary!["CFBundleName"] as! String)
-                    .font(
-                        .system(size: 14)
-                    )
+            Text(appName)
+                .font(
+                    .system(size: 14)
+                )
 
 
-                Spacer()
-                    .frame(width: 32)
+            Spacer()
+                .frame(width: 32)
 
+            if let bundleId = bundle?.bundleIdentifier {
                 ShortcutButton(
-                    browserId: bundle.bundleIdentifier!
+                    browserId: bundleId
                 )
 
                 Spacer()
                     .frame(width: 8)
+            }
 
-                Image(nsImage: NSWorkspace.shared.icon(forFile: bundle.bundlePath))
-                    .resizable()
-                    .frame(width: 32, height: 32)
-            }
-            .padding(10)
-            .sheet(isPresented: $editPresented) {
-                EditAppForm(
-                    app: $app,
-                    isPresented: $editPresented
-                )
-            }
+            Image(nsImage: NSWorkspace.shared.icon(forFile: app.app.path))
+                .resizable()
+                .frame(width: 32, height: 32)
+        }
+        .padding(10)
+        .sheet(isPresented: $editPresented) {
+            EditAppForm(
+                app: $app,
+                isPresented: $editPresented
+            )
         }
     }
 }

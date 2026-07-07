@@ -130,8 +130,8 @@ struct RuleForm: View {
                     }
                 }
                 
-                if let bundle = url.map({ Bundle(url: $0)! }) {
-                    Text("\(bundle.infoDictionary!["CFBundleName"] as! String)")
+                if let url {
+                    Text(Bundle(url: url)?.appDisplayName ?? url.deletingPathExtension().lastPathComponent)
                         .padding(.horizontal, 5)
                         .font(.callout)
                         .foregroundStyle(.secondary)
@@ -168,7 +168,7 @@ struct RuleForm: View {
                 }) {
                     Text("Save")
                 }
-                .disabled(compiledRegex == nil || url == nil)
+                .disabled(regex.isEmpty || compiledRegex == nil || url == nil)
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
         }

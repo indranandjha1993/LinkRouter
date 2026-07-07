@@ -143,7 +143,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             
             let urlString = processedUrls.first!.absoluteString
 
-            for rule in rules {
+            // An empty pattern would match every URL and silently swallow all links.
+            for rule in rules where !rule.regex.isEmpty {
                 let regex = try? Regex(rule.regex).ignoresCase()
                 
                 if let regex, urlString.firstMatch(of: regex) != nil {
@@ -160,8 +161,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         if selectorWindow == nil {
             selectorWindow = LinkRouterWindow()
         }
-        
-        let screen = getScreenWithMouse()!.visibleFrame
+
+        // The mouse can sit exactly on a screen boundary (or displays may be
+        // reconfiguring), in which case no screen matches it.
+        guard let screen = (getScreenWithMouse() ?? NSScreen.main)?.visibleFrame else {
+            return
+        }
         
         selectorWindow?.setFrameOrigin(
             NSPoint(

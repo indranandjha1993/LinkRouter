@@ -68,18 +68,27 @@ class BrowserUtil {
         guard let bundle = Bundle(url: app) else {
             return
         }
-        
+
         let configuration = NSWorkspace.OpenConfiguration()
-        
-        if isIncognito, let privateArg = privateArgs[bundle.bundleIdentifier!] {
+        let privateArg = bundle.bundleIdentifier.flatMap { privateArgs[$0] }
+
+        // Incognito needs a per-browser private-mode argument. Without one,
+        // fall back to a normal open — dropping the URLs would lose the link.
+        if isIncognito, let privateArg, !privateArg.isEmpty {
             configuration.createsNewApplicationInstance = true
             configuration.arguments = [privateArg] + urls.map(\.absoluteString)
+
+            NSWorkspace.shared.open(
+                [],
+                withApplicationAt: app,
+                configuration: configuration
+            )
+        } else {
+            NSWorkspace.shared.open(
+                urls,
+                withApplicationAt: app,
+                configuration: configuration
+            )
         }
-        
-        NSWorkspace.shared.open(
-            isIncognito ? [] : urls,
-            withApplicationAt: app,
-            configuration: configuration
-        )
     }
 }

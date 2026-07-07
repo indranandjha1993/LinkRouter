@@ -17,7 +17,7 @@ struct PromptItem: View {
     var body: some View {
         Button(action: action) {
             HStack {
-                Text(bundle.infoDictionary!["CFBundleName"] as! String)
+                Text(bundle.appDisplayName)
                     .font(
                         .system(size: 12, weight: .bold)
                     )
@@ -49,18 +49,14 @@ struct PromptItem: View {
             }
             .padding(8)
         }
-        .if(shortcut != nil) {
-            return $0.keyboardShortcut(
-                KeyEquivalent(shortcut!.lowercased().first!),
-                modifiers: [.shift]
-            ).background {
-                Button(action: action) {}
-                    .opacity(0)
-                    .keyboardShortcut(
-                        KeyEquivalent(shortcut!.lowercased().first!),
-                        modifiers: []
-                    )
-            }
+        .if(shortcut?.lowercased().first != nil) {
+            let key = KeyEquivalent(shortcut!.lowercased().first!)
+            return $0.keyboardShortcut(key, modifiers: [.shift])
+                .background {
+                    Button(action: action) {}
+                        .opacity(0)
+                        .keyboardShortcut(key, modifiers: [])
+                }
         }
     }
 }
