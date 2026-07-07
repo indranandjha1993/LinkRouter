@@ -18,10 +18,11 @@
 
 ```bash
 brew tap indranandjha1993/tap
-brew install --cask linkrouter --no-quarantine
+brew install --cask linkrouter
+xattr -dr com.apple.quarantine /Applications/LinkRouter.app
 ```
 
-`--no-quarantine` is needed because releases are not notarized with an Apple Developer certificate. Alternatively, download from the [releases page](https://github.com/indranandjha1993/LinkRouter/releases) and allow the app under **System Settings → Privacy & Security**.
+The `xattr` step clears Gatekeeper quarantine — releases are ad-hoc signed, not notarized with an Apple Developer certificate. Alternatively, download from the [releases page](https://github.com/indranandjha1993/LinkRouter/releases) and allow the app under **System Settings → Privacy & Security**.
 
 ### Set as default browser
 
