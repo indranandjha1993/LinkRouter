@@ -1,8 +1,8 @@
 name: CI
 
+# Pull-request checks; pushes to main are covered by release.yml,
+# which runs the same tests and build before publishing.
 on:
-  push:
-    branches: [main]
   pull_request:
 
 jobs:

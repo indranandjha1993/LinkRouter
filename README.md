@@ -3,7 +3,7 @@
 ![LinkRouter](images/linkrouter.png?v2)
 
 <p align="center">
-  <a href="https://github.com/indranandjha1993/LinkRouter/actions/workflows/ci.yml"><img src="https://github.com/indranandjha1993/LinkRouter/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/indranandjha1993/LinkRouter/actions/workflows/release.yml"><img src="https://github.com/indranandjha1993/LinkRouter/actions/workflows/release.yml/badge.svg" alt="Release"></a>
   <a href="https://github.com/indranandjha1993/LinkRouter/releases/latest"><img src="https://img.shields.io/github/v/release/indranandjha1993/LinkRouter?label=release&color=2563EB" alt="Latest release"></a>
   <a href="https://github.com/indranandjha1993/LinkRouter/releases"><img src="https://img.shields.io/github/downloads/indranandjha1993/LinkRouter/total?color=6366F1" alt="Downloads"></a>
   <img src="https://img.shields.io/badge/macOS-13%2B-blue" alt="macOS 13+">
