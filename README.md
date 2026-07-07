@@ -2,6 +2,13 @@
 
 ![LinkRouter](images/linkrouter.png?v2)
 
+<p align="center">
+  <a href="https://github.com/indranandjha1993/LinkRouter/releases/latest"><img src="https://img.shields.io/github/v/release/indranandjha1993/LinkRouter?label=release&color=2563EB" alt="Latest release"></a>
+  <a href="https://github.com/indranandjha1993/LinkRouter/releases"><img src="https://img.shields.io/github/downloads/indranandjha1993/LinkRouter/total?color=6366F1" alt="Downloads"></a>
+  <img src="https://img.shields.io/badge/macOS-13%2B-blue" alt="macOS 13+">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/indranandjha1993/LinkRouter?color=green" alt="GPL-3.0 license"></a>
+</p>
+
 **LinkRouter** is a tiny, fast browser router for macOS written in SwiftUI. Set it as your default browser, and every link you click outside a browser pops up a picker — routing the link to the browser (or browser profile) you choose, with keyboard shortcuts and URL-based rules for automatic routing.
 
 ## Features
@@ -11,6 +18,14 @@
 - 🎯 Rules — route matching URLs (regex) to a browser automatically, no prompt
 - 👤 Supports browser profiles
 - 🖥 macOS Ventura (13) and newer, Apple Silicon and Intel
+
+## In action
+
+| The picker | Preferences |
+|:---:|:---:|
+| <img src="images/screenshot-prompt.png" width="380" alt="The picker — choose a browser for the clicked link"> | <img src="images/screenshot-preferences.png" width="500" alt="Preferences — General tab"> |
+
+Click a link anywhere outside a browser — the picker appears. Choose with the mouse, arrow keys, or a per-browser shortcut, or let a rule route it automatically.
 
 ## Installation
 
